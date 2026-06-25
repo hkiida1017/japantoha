@@ -267,6 +267,51 @@
   .modal-btns .btn.go[disabled]{opacity:1; color:var(--sumi-faint); border-color:var(--line);
     background:var(--washi-3); cursor:not-allowed;}
 
+  /* ---------- Detail sheet (神社仏閣) ---------- */
+  .cbadge{display:inline-flex; align-items:center; justify-content:center; min-width:17px; height:16px;
+    padding:0 4px; border-radius:8px; font-size:10px; line-height:1; background:var(--shu-soft); color:var(--shu);
+    margin-left:1px; font-variant-numeric:tabular-nums;}
+  .chip.on .cbadge{background:rgba(251,241,228,.28); color:#FBF1E4;}
+  .sheet-back{position:fixed; inset:0; background:rgba(36,29,23,.5); display:none; z-index:60;
+    -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); align-items:flex-end; justify-content:center;}
+  .sheet-back.show{display:flex;}
+  .sheet{background:var(--washi-2); width:100%; max-width:660px; border:1px solid var(--line); border-bottom:none;
+    border-radius:20px 20px 0 0; padding:14px 18px calc(20px + env(safe-area-inset-bottom));
+    max-height:86vh; overflow-y:auto; box-shadow:0 -12px 44px rgba(0,0,0,.22);}
+  @media (min-width:680px){ .sheet-back{align-items:center;} .sheet{border-radius:18px; border-bottom:1px solid var(--line); max-height:82vh;} }
+  .sheet .grip{width:40px; height:4px; border-radius:2px; background:var(--line); margin:2px auto 14px;}
+  .sheet .d-pref{font-size:12px; letter-spacing:.16em; color:var(--sumi-soft);}
+  .sheet .d-name{font-family:var(--mincho); font-size:24px; letter-spacing:.04em; margin:2px 0 0;}
+  .d-visit{display:inline-flex; align-items:center; gap:9px; margin-top:14px; cursor:pointer;
+    border:1px solid var(--line); background:var(--washi); color:var(--sumi-soft);
+    border-radius:999px; padding:9px 17px 9px 13px; font-size:14px; transition:background .15s,border-color .15s,color .15s;}
+  .d-visit .dot{width:16px; height:16px; border-radius:50%; border:1.5px solid var(--sumi-faint); position:relative; transition:all .15s;}
+  .d-visit.on{background:var(--shu); border-color:var(--shu-deep); color:#FBF1E4;}
+  .d-visit.on .dot{background:#FBF1E4; border-color:#FBF1E4;}
+  .d-visit.on .dot::after{content:""; position:absolute; left:4px; top:4px; width:6px; height:6px; border-radius:50%; background:var(--shu);}
+  .d-sec{margin-top:18px; border-top:1px dashed var(--line); padding-top:16px;}
+  .d-sec h4{font-family:var(--mincho); font-size:14px; letter-spacing:.1em; margin:0 0 11px; display:flex; align-items:center; gap:8px;}
+  .d-sec h4 .cnt{font-family:var(--gothic); font-size:11px; color:var(--sumi-faint); font-weight:400; letter-spacing:0;}
+  .place-list{display:flex; flex-direction:column; gap:7px; margin-bottom:12px;}
+  .place{display:flex; align-items:center; gap:8px; background:var(--washi); border:1px solid var(--line);
+    border-radius:10px; padding:10px 6px 10px 13px;}
+  .place .mk{flex:none; width:7px; height:7px; border-radius:50%; background:var(--shu); opacity:.75;}
+  .place .pn{flex:1; font-size:14.5px; word-break:break-word; line-height:1.45;}
+  .place .del{flex:none; border:none; background:none; color:var(--sumi-faint); font-size:20px;
+    width:34px; height:34px; border-radius:8px; cursor:pointer;}
+  .place .del:hover{background:var(--shu-soft); color:var(--shu);}
+  .place-empty{font-size:13px; color:var(--sumi-faint); padding:2px 2px 12px; line-height:1.6;}
+  .add-row{display:flex; gap:8px;}
+  .add-row input{flex:1; min-width:0; font-family:var(--gothic); font-size:16px; border:1px solid var(--line);
+    border-radius:10px; padding:11px 12px; background:var(--washi); color:var(--sumi); outline:none;}
+  .add-row input:focus{border-color:var(--shu); box-shadow:0 0 0 3px var(--shu-soft);}
+  .add-row button{flex:none; border:1px solid var(--shu); background:var(--shu-soft); color:var(--shu);
+    border-radius:10px; padding:0 17px; font-size:14px; cursor:pointer;}
+  .add-row button:hover{background:var(--shu-mid);}
+  .d-close{display:block; width:100%; margin-top:18px; border:1px solid var(--line); background:var(--washi);
+    color:var(--sumi); border-radius:10px; padding:12px; font-size:14px; cursor:pointer;}
+  .d-close:hover{background:var(--washi-3);}
+
   :focus-visible{outline:2px solid var(--shu); outline-offset:2px; border-radius:8px;}
   textarea.io{width:100%; height:96px; font-family:ui-monospace,monospace; font-size:11px;
     border:1px solid var(--line); border-radius:10px; padding:10px; margin-top:10px; resize:vertical;
@@ -312,7 +357,7 @@
       </div>
     </div>
     <div class="clear-line">
-      <span class="kinseal"></span>完全踏破した県 <b id="numFull">0</b> / 47
+      <span class="kinseal"></span>完全踏破 <b id="numFull">0</b>県　｜　神社仏閣・名所 <b id="numPlaces">0</b>か所
     </div>
   </section>
 
@@ -328,7 +373,7 @@
     <div class="sect-title">47都道府県スタンプ<span class="note">タップでその県へ</span></div>
     <div class="grid47" id="grid47"></div>
 
-    <div class="sect-title">市区町村をチェック<span class="note">タップで朱印</span></div>
+    <div class="sect-title">市区町村をチェック<span class="note">タップで記録・社寺追加</span></div>
     <div class="list-controls">
       <button id="expandAll">すべて開く</button>
       <button id="collapseAll">すべて閉じる</button>
@@ -351,6 +396,24 @@
   <div class="foot">
     日本全国 踏破帳 ／ オフライン対応・通信不要<br>
     47都道府県・1,741市区町村（市792・特別区23・町743・村183）
+  </div>
+</div>
+
+<div id="sheet" class="sheet-back" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dName">
+    <div class="grip"></div>
+    <div class="d-pref" id="dPref"></div>
+    <div class="d-name" id="dName"></div>
+    <button class="d-visit" id="dVisit"><span class="dot"></span><span id="dVisitTxt">未訪問</span></button>
+    <div class="d-sec">
+      <h4>訪れた神社仏閣・名所 <span class="cnt" id="dCount"></span></h4>
+      <div class="place-list" id="dPlaces"></div>
+      <div class="add-row">
+        <input id="dInput" type="text" placeholder="例：諏訪大社" autocomplete="off" autocapitalize="off" enterkeyhint="done" aria-label="神社仏閣・名所の名前">
+        <button id="dAdd">追加</button>
+      </div>
+    </div>
+    <button class="d-close" id="dClose">閉じる</button>
   </div>
 </div>
 
@@ -382,17 +445,18 @@ DATA.forEach((pr,pi)=>{
 });
 
 let visited = {};      // id -> ISO date string
+let places = {};       // id -> [神社仏閣・名所 names]
 let prefCount = DATA.map(()=>0);
 
 function load(){
   try{
     const raw = localStorage.getItem(STORE_KEY);
-    if(raw){ const o = JSON.parse(raw); visited = o.visited || {}; }
-  }catch(e){ visited = {}; }
+    if(raw){ const o = JSON.parse(raw); visited = o.visited || {}; places = o.places || {}; }
+  }catch(e){ visited = {}; places = {}; }
   recountAll();
 }
 function save(){
-  try{ localStorage.setItem(STORE_KEY, JSON.stringify({v:1, visited})); }catch(e){}
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify({v:2, visited, places})); }catch(e){}
 }
 function recountAll(){
   prefCount = DATA.map(()=>0);
@@ -409,12 +473,14 @@ function setRing(circle, ratio){
 function updateHero(){
   let muni=0, prefV=0, full=0;
   prefCount.forEach((c,i)=>{ muni+=c; if(c>0)prefV++; if(c===DATA[i].total)full++; });
+  let placeTotal=0; for(const k in places) placeTotal+=places[k].length;
   const pPref = prefV/47, pMuni = muni/TOTAL_MUNI;
   document.getElementById("numPref").textContent=prefV;
   document.getElementById("pctPref").textContent=Math.round(pPref*100);
   document.getElementById("numMuni").textContent=muni.toLocaleString();
   document.getElementById("pctMuni").textContent=Math.round(pMuni*100);
   document.getElementById("numFull").textContent=full;
+  document.getElementById("numPlaces").textContent=placeTotal;
   setRing(document.getElementById("ringPref"), pPref);
   setRing(document.getElementById("ringMuni"), pMuni);
 }
@@ -473,7 +539,9 @@ function buildBody(pi){
     const chip=document.createElement("div"); chip.className="chip"; chip.dataset.id=m.id;
     chip.innerHTML='<span class="dot"></span>'+(m[1]?'<span class="gun">'+m[1]+'</span>':'')+'<span class="nm">'+m[0]+'</span>';
     if(visited[m.id]) chip.classList.add("on");
-    chip.addEventListener("click",()=>toggleMuni(m, chip));
+    const n=(places[m.id]||[]).length;
+    if(n>0){ const b=document.createElement("span"); b.className="cbadge"; b.textContent=n; chip.appendChild(b); }
+    chip.addEventListener("click",()=>openDetail(m));
     chips.appendChild(chip);
   });
   body.appendChild(chips);
@@ -491,20 +559,98 @@ function jumpToPref(pi){
   o.wrap.scrollIntoView({behavior:"smooth", block:"start"});
 }
 
-// ---- toggle a municipality ----
-function toggleMuni(m, chipEl){
-  const id=m.id, now=!visited[id];
-  if(now){ visited[id]=new Date().toISOString().slice(0,10); prefCount[m.pi]++; }
-  else { delete visited[id]; prefCount[m.pi]--; }
-  // update this chip (and any duplicate in search results)
+// ---- visited + chip state ----
+function cssEsc(s){ return s.replace(/["\\]/g,'\\$&'); }
+function applyChipState(m){
+  const id=m.id, on=!!visited[id], n=(places[id]||[]).length;
   document.querySelectorAll('.chip[data-id="'+cssEsc(id)+'"]').forEach(c=>{
-    c.classList.toggle("on", now);
-    if(now){ c.classList.remove("stamp"); void c.offsetWidth; c.classList.add("stamp"); }
+    c.classList.toggle("on", on);
+    let b=c.querySelector(".cbadge");
+    if(n>0){ if(!b){ b=document.createElement("span"); b.className="cbadge"; c.appendChild(b); } b.textContent=n; }
+    else if(b){ b.remove(); }
   });
-  if(now && navigator.vibrate) navigator.vibrate(14);
+}
+function stampChip(id){
+  document.querySelectorAll('.chip[data-id="'+cssEsc(id)+'"]').forEach(c=>{
+    c.classList.remove("stamp"); void c.offsetWidth; c.classList.add("stamp");
+  });
+}
+function setVisited(m, state){
+  const id=m.id;
+  if(state === !!visited[id]) return;
+  if(state){ visited[id]=new Date().toISOString().slice(0,10); prefCount[m.pi]++; if(navigator.vibrate) navigator.vibrate(14); }
+  else { delete visited[id]; prefCount[m.pi]--; }
+  applyChipState(m); if(state) stampChip(id);
   updatePrefHead(m.pi); updateCell(m.pi); updateHero(); save();
 }
-function cssEsc(s){ return s.replace(/["\\]/g,'\\$&'); }
+
+// ---- places (神社仏閣・名所) ----
+function addPlace(m, name){
+  name=(name||"").trim(); if(!name) return;
+  const id=m.id;
+  if(!places[id]) places[id]=[];
+  places[id].push(name);
+  if(!visited[id]) setVisited(m, true);
+  applyChipState(m); save();
+  if(detailM && detailM.id===id){ renderDetailPlaces(m); updateDetailVisit(); }
+  updateHero();
+}
+function removePlace(m, idx){
+  const id=m.id, a=places[id]; if(!a) return;
+  a.splice(idx,1); if(!a.length) delete places[id];
+  applyChipState(m); save();
+  if(detailM && detailM.id===id) renderDetailPlaces(m);
+  updateHero();
+}
+
+// ---- detail sheet ----
+const sheet=document.getElementById("sheet");
+const dInput=document.getElementById("dInput");
+let detailM=null;
+function openDetail(m){
+  detailM=m;
+  document.getElementById("dPref").textContent = DATA[m.pi].p + (m[1] ? "　"+m[1] : "");
+  document.getElementById("dName").textContent = m[0];
+  updateDetailVisit();
+  renderDetailPlaces(m);
+  dInput.value="";
+  sheet.classList.add("show"); sheet.setAttribute("aria-hidden","false");
+}
+function closeDetail(){
+  sheet.classList.remove("show"); sheet.setAttribute("aria-hidden","true"); detailM=null;
+}
+function updateDetailVisit(){
+  if(!detailM) return;
+  const on=!!visited[detailM.id];
+  document.getElementById("dVisit").classList.toggle("on", on);
+  document.getElementById("dVisitTxt").textContent = on ? "訪問済み" : "未訪問（タップで朱印）";
+}
+function renderDetailPlaces(m){
+  const arr=places[m.id]||[];
+  document.getElementById("dCount").textContent = arr.length ? arr.length+"件" : "";
+  const box=document.getElementById("dPlaces"); box.innerHTML="";
+  if(!arr.length){
+    box.innerHTML='<div class="place-empty">まだ登録がありません。下の欄に名前を入れて「追加」してください。</div>';
+    return;
+  }
+  arr.forEach((nm,i)=>{
+    const row=document.createElement("div"); row.className="place";
+    row.innerHTML='<span class="mk"></span><span class="pn"></span><button class="del" aria-label="削除">×</button>';
+    row.querySelector(".pn").textContent=nm;
+    row.querySelector(".del").addEventListener("click",()=>removePlace(m,i));
+    box.appendChild(row);
+  });
+}
+document.getElementById("dVisit").addEventListener("click",()=>{
+  if(!detailM) return;
+  setVisited(detailM, !visited[detailM.id]); updateDetailVisit();
+});
+function doAdd(){ if(!detailM) return; const v=dInput.value; if(!v.trim()) return; addPlace(detailM, v); dInput.value=""; dInput.focus(); }
+document.getElementById("dAdd").addEventListener("click",doAdd);
+dInput.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); doAdd(); } });
+document.getElementById("dClose").addEventListener("click",closeDetail);
+sheet.addEventListener("click",e=>{ if(e.target===sheet) closeDetail(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && sheet.classList.contains("show")) closeDetail(); });
 
 // ---- search ----
 const qEl=document.getElementById("q");
@@ -531,14 +677,16 @@ function runSearch(){
     resEl.innerHTML='<div class="empty-search">「'+escapeHtml(raw)+'」に一致する市区町村は見つかりませんでした。</div>';
     return;
   }
-  let html='<div class="sect-title">検索結果<span class="note">'+hits.length+'件 ／ タップで朱印</span></div><div class="chips" id="resChips"></div>';
+  let html='<div class="sect-title">検索結果<span class="note">'+hits.length+'件 ／ タップで記録</span></div><div class="chips" id="resChips"></div>';
   resEl.innerHTML=html;
   const box=document.getElementById("resChips");
   hits.forEach(h=>{
     const m=h.m;
     const chip=document.createElement("div"); chip.className="chip"+(visited[m.id]?" on":""); chip.dataset.id=m.id;
     chip.innerHTML='<span class="dot"></span><span class="gun">'+escapeHtml(PREF_SHORT[h.pref])+'</span><span class="nm">'+escapeHtml(m[0])+'</span>';
-    chip.addEventListener("click",()=>toggleMuni(m, chip));
+    const n=(places[m.id]||[]).length;
+    if(n>0){ const b=document.createElement("span"); b.className="cbadge"; b.textContent=n; chip.appendChild(b); }
+    chip.addEventListener("click",()=>openDetail(m));
     box.appendChild(chip);
   });
 }
@@ -563,7 +711,7 @@ function toast(msg){
 
 // ---- export / import / reset ----
 document.getElementById("exportBtn").addEventListener("click",()=>{
-  const payload=JSON.stringify({v:1, app:"tohaccho", exported:new Date().toISOString(), visited}, null, 0);
+  const payload=JSON.stringify({v:2, app:"tohaccho", exported:new Date().toISOString(), visited, places}, null, 0);
   const cnt=Object.keys(visited).length;
   const fname="踏破帳_"+new Date().toISOString().slice(0,10)+".json";
   try{
@@ -593,7 +741,8 @@ function applyImport(text){
   if(!v){ toast("読み込めるデータが含まれていません"); return; }
   const cnt=Object.keys(v).length;
   if(!confirm("バックアップ（"+cnt+"件）を読み込みます。現在の記録は上書きされます。よろしいですか？")) return;
-  visited=v; recountAll(); save(); fullRefresh();
+  visited=v; places=(o.places && typeof o.places==="object") ? o.places : {};
+  recountAll(); save(); fullRefresh();
   toast("読み込みました（"+cnt+"件）");
 }
 const resetModal=document.getElementById("resetModal");
@@ -617,20 +766,20 @@ resetModal.addEventListener("click",e=>{ if(e.target===resetModal) closeReset();
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && resetModal.classList.contains("show")) closeReset(); });
 rmConfirm.addEventListener("click",()=>{
   if(rmInput.value.trim()!==RM_WORD) return;
-  visited={}; recountAll(); save(); fullRefresh(); closeReset();
+  visited={}; places={}; recountAll(); save(); fullRefresh(); closeReset();
   toast("記録をリセットしました");
 });
 function fullRefresh(){
-  // rebuild any built bodies' chip states
-  DATA.forEach((pr,pi)=>{
-    updatePrefHead(pi); updateCell(pi);
-    if(prefEls[pi].built){
-      prefEls[pi].body.querySelectorAll(".chip").forEach(c=>{
-        c.classList.toggle("on", !!visited[c.dataset.id]);
-      });
-    }
+  DATA.forEach((pr,pi)=>{ updatePrefHead(pi); updateCell(pi); });
+  document.querySelectorAll(".chip").forEach(c=>{
+    const id=c.dataset.id, on=!!visited[id], n=(places[id]||[]).length;
+    c.classList.toggle("on", on);
+    let b=c.querySelector(".cbadge");
+    if(n>0){ if(!b){ b=document.createElement("span"); b.className="cbadge"; c.appendChild(b); } b.textContent=n; }
+    else if(b){ b.remove(); }
   });
   updateHero(); runSearch();
+  if(sheet.classList.contains("show") && detailM){ updateDetailVisit(); renderDetailPlaces(detailM); }
 }
 
 // ---- init ----
