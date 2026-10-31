@@ -376,9 +376,13 @@
   .map-open{display:block; width:100%; border:none; background:none; padding:20px 12px; font-family:var(--gothic);
     font-size:14px; color:var(--shu); cursor:pointer; letter-spacing:.06em;}
   .map-bar{display:flex; align-items:center; gap:6px; padding:9px 10px; border-bottom:1px solid var(--line-soft);}
-  .map-bar .ttl{flex:1; min-width:0; font-family:var(--mincho); font-size:15px; letter-spacing:.06em;
+  .map-bar{flex-wrap:wrap;}
+  .map-bar .ttl{order:-1; flex:1 0 100%; padding:0 2px 2px;}   /* 名前は上の段、ボタンは下の段 */
+  .map-bar #mapClose{margin-left:auto;}
+  .map-bar .ttl{min-width:0; font-family:var(--mincho); font-size:15px; letter-spacing:.06em;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .map-bar .ttl small{font-family:var(--gothic); font-size:11.5px; color:var(--sumi-soft); margin-left:6px; letter-spacing:0;}
+  .map-bar #mapClose{color:var(--shu); border-color:rgba(178,58,46,.35);}
   .map-bar button{flex:none; border:1px solid var(--line); background:var(--washi); color:var(--sumi); border-radius:8px;
     min-width:34px; height:32px; padding:0 9px; font-size:13px; cursor:pointer; font-family:var(--gothic);}
   .map-view{position:relative; height:min(68vh,520px); background:#E6EEEC; touch-action:none; overflow:hidden;}
@@ -458,6 +462,7 @@
           <button id="mapZin" aria-label="拡大">＋</button>
           <button id="mapZout" aria-label="縮小">－</button>
           <button id="mapFit">全体</button>
+          <button id="mapClose" aria-label="地図をたたむ">▲ たたむ</button>
         </div>
         <div class="map-view" id="mapView"><svg id="mapSvg" xmlns="http://www.w3.org/2000/svg"></svg><div class="map-msg" id="mapMsg"></div></div>
         <div class="map-hint" id="mapHint"></div>
@@ -1120,9 +1125,19 @@ function openMapUi(){
   document.getElementById("mapOpen").style.display="none";
   document.getElementById("mapUi").style.display="";
   meta.mapOn=true; saveMeta();
-  showMap("japan");
+  if(mapState){ setVB(fitBox(mapState.vb)); mapRefreshAll(); }   // たたむ前に見ていた地図に戻る
+  else showMap("japan");
+}
+// たたむと地図を隠す。次にアプリを開いたときも、たたんだままにする
+function closeMapUi(){
+  document.getElementById("mapUi").style.display="none";
+  document.getElementById("mapOpen").style.display="";
+  meta.mapOn=false; saveMeta();
+  ptrs.clear(); gest=null;
+  document.getElementById("mapCard").scrollIntoView({block:"nearest"});
 }
 document.getElementById("mapOpen").addEventListener("click",openMapUi);
+document.getElementById("mapClose").addEventListener("click",closeMapUi);
 document.getElementById("mapBack").addEventListener("click",()=>showMap("japan"));
 function zoomAt(cx,cy,f){
   if(!mapState) return;
